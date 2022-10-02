@@ -92,7 +92,7 @@ userSchema.methods.toJSON = function(){
     console.log("userObject",userObject)
     return userObject
 }
-//hash the plain text password before saveing
+//hash the plain text password before saving
 userSchema.pre('save',async function(next){
         console.log('inside pre middleware')
         const user = this

@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken')
-const multer = require('multer')
+// const multer = require('multer')
 
 const User = require('../models/user')
 
@@ -20,19 +20,19 @@ const auth = async(req,res,next)=>{
     }
 }
 
-const upload = multer({
-    limits:{
-        fileSize:1000000
-    },
-    fileFilter(req,file,cb){
+// const upload = multer({
+//     limits:{
+//         fileSize:1000000
+//     },
+//     fileFilter(req,file,cb){
 
-        if(!file.originalname.match(/\.(png|jpg|jpeg)$/)){
-            return cb(new Error('invalid file format'))
-        }
+//         if(!file.originalname.match(/\.(png|jpg|jpeg)$/)){
+//             return cb(new Error('invalid file format'))
+//         }
 
-        cb(undefined,true)
+//         cb(undefined,true)
 
-    }
-})
+//     }
+// })
 
-module.exports ={auth,upload}
+module.exports ={auth}

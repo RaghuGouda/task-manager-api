@@ -1,6 +1,7 @@
 const express = require('express')
 const Task = require('../models/task')
 const {auth} = require('../middleware/auth')
+const {docUpload} = require('../middleware/fileUploads')
 const router = new express.Router()
 
 
@@ -146,4 +147,56 @@ router.delete('/task/:task_id',auth,async(req,res)=>{
     }
 })
 
-module.exports = router
+router.post('/task/:task_id/uploadfile',docUpload.single('fileUpload'),auth,async(req,res)=>{
+    const _id =req.params.task_id
+    const document = req.file.buffer
+    try {
+        const task = await Task.findOne({_id,owner:req.user._id})
+        if(!task){
+            throw new Error()
+        }
+        task.documents = task.documents.concat({document})
+        await task.save()
+        res.send()
+        
+    } catch (error) {
+        res.status(400).send({error:error.message}) 
+    }
+})
+
+router.delete('/task/:task_id/document/:doc_id',auth,async(req,res)=>{
+    const _id =req.params.task_id
+    try {
+        const task = await Task.findOne({_id,owner:req.user._id})
+        if(!task){
+            throw new Error()
+        }
+        temp = task.documents
+        task.documents = task.documents.filter(item=>item._id.toString()!==req.params.doc_id)
+        await task.save()
+        if(temp.length === task.documents.length){
+           return res.send({count:0})
+        }
+        res.send({count:1})
+        
+    } catch (error) {
+        res.status(500).send({error:error.message}) 
+    }
+})
+
+router.get('/task/:task_id/openfile',auth,async(req,res)=>{
+    const _id =req.params.task_id
+    try {
+        const task = await Task.findOne({_id})
+
+       if(!task.document){
+           throw new Error()
+       }
+       res.set('Content-Type','multipart/form-data')
+       res.send(task.document)
+    } catch (err) {
+        res.status(500).send()
+    }
+})
+
+module.exports = router 

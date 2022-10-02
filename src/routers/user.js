@@ -1,7 +1,8 @@
 const express = require('express')
 const sharp = require('sharp')
 const User = require('../models/user')
-const {auth,upload} = require('../middleware/auth')
+const {auth} = require('../middleware/auth')
+const {ImageUpload} = require('../middleware/fileUploads')
 const router = new express.Router()
 
 
@@ -190,7 +191,7 @@ router.delete('/user/me',auth, async(req,res)=>{
     }
 })
 
-router.post('/user/me/avatar',upload.single('fileUpload'),auth,async(req,res)=>{
+router.post('/user/me/avatar',ImageUpload.single('fileUpload'),auth,async(req,res)=>{
     req.user.avatar =await sharp(req.file.buffer).resize({width:250,height:250}).png().toBuffer() 
     await req.user.save()
     res.send()
