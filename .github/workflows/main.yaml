@@ -29,13 +29,12 @@ jobs:
       - name: NPM install, build and test
         run: |
           npm install
-          npm run start
-        env: 
-          MONGODB_URL: ${{ secrets.MONGODB_URL }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          MJ_API_KEY: ${{ secrets.MJ_API_KEY }}
-          MJ_SECRET_KEY: ${{ secrets.MJ_SECRET_KEY }}
-          FROM_EMAIL: ${{ secrets.FROM_EMAIL }}
+        # env: 
+        #   MONGODB_URL: ${{ secrets.MONGODB_URL }}
+        #   JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        #   MJ_API_KEY: ${{ secrets.MJ_API_KEY }}
+        #   MJ_SECRET_KEY: ${{ secrets.MJ_SECRET_KEY }}
+        #   FROM_EMAIL: ${{ secrets.FROM_EMAIL }}
 
 
   # Heavily modified deploy job to fit render.com
