@@ -141,7 +141,7 @@ userSchema.pre('remove',async function(next){
     next()
 })
 
-const user_db =  makeNewConnection(process.env.USER_MONGODB_URL)
-const User = user_db.model('User',userSchema)
+// const user_db =  makeNewConnection(process.env.USER_MONGODB_URL)
+const User = mongoose.model('User',userSchema)
 
 module.exports = User
