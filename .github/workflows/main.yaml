@@ -53,7 +53,7 @@ jobs:
   test:
     name: E2E tests
     needs: [deploy]
-    
+    runs-on: ubuntu-latest
     steps:
       - name: Run tests
         run: npm test        
