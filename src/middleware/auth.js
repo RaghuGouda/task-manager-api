@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken')
 const multer = require('multer')
+const speakeasy = require('speakeasy');
 
 const User = require('../models/user')
 
@@ -35,4 +36,15 @@ const upload = multer({
     }
 })
 
-module.exports ={auth,upload}
+const verifyOtp = async(secret_key,otp)=>{
+    const tokenValidates = speakeasy.totp.verify({
+        secret: secret_key,
+        encoding: 'base32',
+        token: otp,
+        window:2
+    });
+    return tokenValidates
+}
+
+
+module.exports ={auth,upload,verifyOtp}
