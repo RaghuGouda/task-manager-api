@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-
+const {makeNewConnection} = require('../db/mongoose')
 const taskSchema = new mongoose.Schema({
     description:{
         type:String,
@@ -19,7 +19,8 @@ const taskSchema = new mongoose.Schema({
     timestamps:true
 })
 
-const Task = mongoose.model('Task',taskSchema)
+const task_db = makeNewConnection(process.env.TASK_MONGODB_URL)
+const Task = task_db.model('Task',taskSchema)
 
 
 module.exports = Task

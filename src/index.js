@@ -223,13 +223,13 @@ app.use(taskRouter);
 //     }
 // })
 
-const main =async ()=>{
-        const user = await User.findById('62a7f0daf7f990e51627d139')
-        await user.populate('tasks')
-        console.log(user.tasks)
-}
+// const main =async ()=>{
+//         const user = await User.findById('62a7f0daf7f990e51627d139')
+//         await user.populate('tasks')
+//         console.log(user.tasks)
+// }
 // main()
 
-app.listen(port,()=>{
-    console.log(`server is on port ${port}`)
+app.listen(port || 3000,()=>{
+    console.log(`server is on port ${port||3000}`)
 })

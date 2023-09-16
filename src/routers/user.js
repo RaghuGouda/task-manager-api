@@ -1,7 +1,9 @@
 const express = require('express')
 const sharp = require('sharp')
 const User = require('../models/user')
-const {auth,upload} = require('../middleware/auth')
+const {auth,upload,verifyOtp} = require('../middleware/auth')
+const {sendOtpInEmail} = require('../services/email')
+const { verify } = require('jsonwebtoken')
 const router = new express.Router()
 
 
@@ -48,9 +50,10 @@ router.post('/user/login',async(req,res)=>{
         const user = await User.findByCredential(req.body.email,req.body.password)
         console.log("user.getPublicProfile()")
         const token = await user.generateAuthToken()
+        console.log("userstatus",{user})
         res.send({user,token})     
     } catch (err) {
-        res.status(400).send(err)
+        res.status(400).send({'error':err.message})
     }
 })
 
@@ -115,7 +118,7 @@ router.get('/user/:user_id',async(req,res)=>{
         res.send(user)
         
     } catch (err) {
-        res.status(500).send() 
+        res.status(500).send(err) 
     }
 
     // User.findById(_id).then((user)=>{
@@ -211,7 +214,6 @@ router.delete('/user/me/avatar',auth, async(req,res)=>{
 })
 
 router.get('/user/:user_id/avatar',async(req,res)=>{
-
     try {
        const user = await User.findById(req.params.user_id)
 
@@ -220,6 +222,32 @@ router.get('/user/:user_id/avatar',async(req,res)=>{
        }
        res.set('Content-Type','image/png')
        res.send(user.avatar)
+    } catch (err) {
+        res.status(500).send()
+    }
+})
+
+router.post('/generate-otp',auth,async(req,res)=>{
+    try {
+        const user = await User.findByEmail(req.body.email,req.user._id)
+        const {otp} = await user.generateOtp();
+        await sendOtpInEmail(user.email,user.name,otp)
+        res.status(200).send(otp)          
+    } catch (err) {
+        res.status(400).send({err:err.message})
+    }
+})
+
+router.post('/verify-otp',auth,async(req,res)=>{
+    try {
+        const secret_key = req.user.secret
+        const otp = req.body.otp
+        const isvaildOtp = await verifyOtp(secret_key,otp)
+        if(!isvaildOtp){
+           return res.status(440).send({'message':'Invaild OTP / OTP has expired'})
+        }
+        console.log("isvaildOtp",isvaildOtp)
+        res.status(200).send({'verified':isvaildOtp})
     } catch (err) {
         res.status(500).send()
     }

@@ -1,7 +1,10 @@
 const mongoose = require('mongoose')
+const {makeNewConnection} = require('../db/mongoose')
 const validator = require('validator')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const speakeasy = require('speakeasy');
+
 const Task = require('./task')
 
 const userSchema = new mongoose.Schema({
@@ -48,6 +51,9 @@ const userSchema = new mongoose.Schema({
             required:true
         }
     }],
+    secret:{
+        type:String,
+    },
     avatar:{
         type:Buffer
     }  
@@ -75,6 +81,15 @@ userSchema.statics.findByCredential = async (email,password)=>{
     return user
 }
 
+userSchema.statics.findByEmail = async (email,_id)=>{
+    console.log('inside findByCredential ')
+    const user = await User.findOne({email,_id})
+    if(!user){
+        throw new Error('unable to login');
+    }
+    return user
+}
+
 userSchema.methods.generateAuthToken = async function(){
     const user = this
     const token = jwt.sign({_id:user._id.toString()},process.env.JWT_SECRET)
@@ -83,6 +98,23 @@ userSchema.methods.generateAuthToken = async function(){
     return token
 } 
 
+//genarate otp
+userSchema.methods.generateOtp = async function(){
+    const user = this
+    const secret = speakeasy.generateSecret({length: 20});
+    const otp = speakeasy.totp({
+        secret: secret.base32,
+        encoding: 'base32'
+    }); 
+    if(!otp){
+        throw new Error('otp failed');
+    }
+    user.secret = secret.base32  
+    await user.save()
+    return {otp} 
+}
+
+//method to hide private data / send only public data to api response
 userSchema.methods.toJSON = function(){
     const user = this
     const userObject = user.toObject()
@@ -109,9 +141,7 @@ userSchema.pre('remove',async function(next){
     next()
 })
 
-
-
-
-const User = mongoose.model('User',userSchema)
+const user_db =  makeNewConnection(process.env.USER_MONGODB_URL)
+const User = user_db.model('User',userSchema)
 
 module.exports = User
