@@ -56,7 +56,7 @@ jobs:
     runs-on: ubuntu-latest
  
     steps:
-      -name: Checkout Test Repository
+      - name: Checkout Test Repository
         uses: actions/checkout@v3
         with:
           ref: main
