@@ -61,4 +61,6 @@ jobs:
         with:
           ref: main
       - name: Run tests
-        run: npm test        
+        run: |
+          npm install
+          npm test      
