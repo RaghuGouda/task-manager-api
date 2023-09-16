@@ -19,8 +19,8 @@ const taskSchema = new mongoose.Schema({
     timestamps:true
 })
 
-const task_db = makeNewConnection(process.env.TASK_MONGODB_URL)
-const Task = task_db.model('Task',taskSchema)
+// const task_db = makeNewConnection(process.env.TASK_MONGODB_URL)
+const Task = mongoose.model('Task',taskSchema)
 
 
 module.exports = Task
