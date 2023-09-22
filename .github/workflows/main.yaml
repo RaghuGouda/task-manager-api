@@ -39,6 +39,7 @@ jobs:
     name: Validate PR
     needs: [unit-test]
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
 
     steps:
       - name: Check Unit Test Status
