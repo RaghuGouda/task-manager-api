@@ -111,14 +111,3 @@ jobs:
         run: |
           npm install
           npm test      
-
-# Workflow to trigger build and deploy after PR is merged
-workflow "CI/CD" {
-  resolves = ["build", "deploy","test"]
-  on = "pull_request"
-}
-
-workflow_run:
-  jobs: build, deploy, test
-  types:
-    - requested
