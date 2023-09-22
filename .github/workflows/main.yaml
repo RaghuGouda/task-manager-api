@@ -44,7 +44,12 @@ jobs:
     steps:
       - name: Check Unit Test Status
         id: test-status
-        run: echo "::set-output name=status::$(if [ -s test-results.xml ]; then echo 'success'; else echo 'failure'; fi)"
+          run: |
+            if grep -q "Tests failed" <<< "$(npm run unit)"; then
+              echo "::set-output name=status::failure"
+            else
+              echo "::set-output name=status::success"
+            fi
 
       - name: Comment on PR
         if: steps.test-status.outputs.status == 'failure'
