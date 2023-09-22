@@ -10,11 +10,10 @@ on:
   workflow_run:
     workflows: ["CI/CD"]
     types:
-      - completed  
-
+      - completed
 
 jobs:
-    # Unit Test job
+  # Unit Test job
   unit-test:
     name: Unit Tests
     runs-on: ubuntu-latest
@@ -33,8 +32,8 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      # - name: Run Unit Tests
-      #   run: npm test
+      - name: Run Unit Tests
+        run: npm run unit
 
   validate-pr:
     name: Validate PR
@@ -44,7 +43,12 @@ jobs:
     steps:
       - name: Check Unit Test Status
         id: test-status
-        run: echo "::set-output name=status::$(if [ -s test-results.xml ]; then echo 'success'; else echo 'failure'; fi)"
+        run: |
+          if grep -q "Tests failed" <<< "$(npm run unit)"; then
+            echo "::set-output name=status::failure"
+          else
+            echo "::set-output name=status::success"
+          fi
 
       - name: Comment on PR
         if: steps.test-status.outputs.status == 'failure'
@@ -55,6 +59,7 @@ jobs:
   build:
     name: User app
     runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' # Only run on push to main branch
 
     strategy: 
       matrix:
@@ -110,15 +115,4 @@ jobs:
       - name: Run tests
         run: |
           npm install
-          npm test      
-
-# Workflow to trigger build and deploy after PR is merged
-workflow "CI/CD" {
-  resolves = ["build", "deploy","test"]
-  on = "pull_request"
-}
-
-workflow_run:
-  jobs: build, deploy, test
-  types:
-    - requested
+          npm test
