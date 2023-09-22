@@ -80,6 +80,7 @@ jobs:
       - name: NPM install,build
         run: |
           npm install
+          exit 1
         # env: 
         #   MONGODB_URL: ${{ secrets.MONGODB_URL }}
         #   JWT_SECRET: ${{ secrets.JWT_SECRET }}
