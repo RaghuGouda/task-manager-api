@@ -55,6 +55,7 @@ jobs:
   build:
     name: User app
     runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' # Only run on push to main branch
 
     strategy: 
       matrix:
