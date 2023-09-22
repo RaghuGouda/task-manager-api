@@ -2,10 +2,51 @@ name: Node.JS CI/CD
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 
 jobs:
+    # Unit Test job
+  unit-test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+
+      - name: Install Dependencies
+        run: npm install
+
+      # - name: Run Unit Tests
+      #   run: npm test
+
+  validate-pr:
+    name: Validate PR
+    needs: [unit-test]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check Unit Test Status
+        id: test-status
+        run: echo "::set-output name=status::$(if [ -s test-results.xml ]; then echo 'success'; else echo 'failure'; fi)"
+
+      - name: Comment on PR
+        if: steps.test-status.outputs.status == 'failure'
+        run: |
+          echo "Tests failed. This PR cannot be merged."
+          exit 1
 
   build:
     name: User app
@@ -17,12 +58,12 @@ jobs:
 
     steps:
       - name: Checkout 
-        uses: actions/checkout@v3 # was "v2" before 
+        uses: actions/checkout@v3 
         with: 
           fetch-depth: 0
 
       - name: Use Node.JS ${{ matrix.node-version }}
-        uses: actions/setup-node@v3 # was "v2" before
+        uses: actions/setup-node@v3 
         with: 
           node-version: ${{ matrix.node-version }}
 
@@ -50,6 +91,8 @@ jobs:
           service-id: ${{ secrets.SERVICE_ID }} # Can be found as part of the Deploy Hook
           api-key: ${{ secrets.RENDER_API_KEY }} # Create your API key in Render Dashboard > Account Settings
 
+
+  #Test job
   test:
     name: E2E tests
     needs: [deploy]
