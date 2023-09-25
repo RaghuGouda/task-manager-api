@@ -35,7 +35,6 @@ jobs:
       - name: Run Unit Tests
         run: |
           npm run unit
-          exit 1
 
   validate-pr:
     name: Validate PR
