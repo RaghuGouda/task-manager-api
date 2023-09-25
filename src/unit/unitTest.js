@@ -1,6 +1,6 @@
 const getUsers = async()=>{
 
-    console.log("printing user");
+    console.log("Tests failed");
 
 }
 getUsers()
