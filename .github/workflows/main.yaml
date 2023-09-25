@@ -34,8 +34,8 @@ jobs:
 
       - name: Run Unit Tests
         run: |
-          npm run unit
           echo "Tests failed"
+          exit 1
 
   validate-pr:
     name: Validate PR
